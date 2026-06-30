@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"strings"
 	"sync"
 	"time"
@@ -220,7 +221,7 @@ func (s *Server) runScan(c *fiber.Ctx) error {
 	scanMu.Unlock()
 
 	go func() {
-		ctx := c.Context()
+		ctx := context.Background()
 		// Run scan in background; stream progress via ticker
 		results, err := s.scan.Scan(ctx, req.CIDR, req.Communities)
 		scanMu.Lock()
