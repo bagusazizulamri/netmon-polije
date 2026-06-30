@@ -22,8 +22,13 @@ type BuildingConfig struct {
 	ID     string `mapstructure:"id" json:"id"`
 	Name   string `mapstructure:"name" json:"name"`
 	Short  string `mapstructure:"short" json:"short"`
+	X      int    `mapstructure:"x" json:"x"`
+	Y      int    `mapstructure:"y" json:"y"`
+	W      int    `mapstructure:"w" json:"w"`
+	H      int    `mapstructure:"h" json:"h"`
 	Subnet string `mapstructure:"subnet" json:"subnet"`
 	Vlan   int    `mapstructure:"vlan" json:"vlan"`
+	Color  string `mapstructure:"color" json:"color"`
 }
 
 type ServerConfig struct {
@@ -144,20 +149,20 @@ func Load(path string) (*Config, error) {
 	}
 	if len(cfg.Buildings) == 0 {
 		cfg.Buildings = []BuildingConfig{
-			{ID: "rektorat", Name: "Gedung Utama / Rektorat", Short: "REKT", Subnet: "10.10.0.0/24", Vlan: 10},
-			{ID: "tip", Name: "Jurusan Teknologi Informasi", Short: "TIP", Subnet: "10.10.10.0/24", Vlan: 110},
-			{ID: "tik", Name: "TIK / Data Center", Short: "TIK", Subnet: "10.10.1.0/24", Vlan: 1},
-			{ID: "mif", Name: "Gedung MIF", Short: "MIF", Subnet: "10.10.12.0/24", Vlan: 112},
-			{ID: "mesin", Name: "Teknik Mesin", Short: "MSN", Subnet: "10.10.20.0/24", Vlan: 120},
-			{ID: "tep", Name: "Teknologi Pertanian", Short: "TEP", Subnet: "10.10.30.0/24", Vlan: 130},
-			{ID: "pet", Name: "Peternakan", Short: "PET", Subnet: "10.10.40.0/24", Vlan: 140},
-			{ID: "labterpadu", Name: "Lab Terpadu", Short: "LAB", Subnet: "10.10.50.0/24", Vlan: 150},
-			{ID: "perpustakaan", Name: "Perpustakaan", Short: "PUS", Subnet: "10.10.60.0/24", Vlan: 160},
-			{ID: "aula", Name: "Aula Soetrisno", Short: "AULA", Subnet: "10.10.61.0/24", Vlan: 161},
-			{ID: "gor", Name: "GOR Perjuangan 45", Short: "GOR", Subnet: "10.10.62.0/24", Vlan: 162},
-			{ID: "asrama", Name: "Asrama Mahasiswa", Short: "ASR", Subnet: "10.10.70.0/24", Vlan: 170},
-			{ID: "kantin", Name: "Kantin Pusat", Short: "KTN", Subnet: "10.10.71.0/24", Vlan: 171},
-			{ID: "greenhouse", Name: "Green House / Lab Lapang", Short: "GH", Subnet: "10.10.80.0/24", Vlan: 180},
+			{ID: "rektorat", Name: "Gedung Utama / Rektorat", Short: "REKT", X: 500, Y: 120, W: 210, H: 78, Subnet: "10.10.0.0/24", Vlan: 10, Color: "#eaf1ff"},
+			{ID: "tip", Name: "Jurusan Teknologi Informasi", Short: "TIP", X: 260, Y: 210, W: 190, H: 74, Subnet: "10.10.10.0/24", Vlan: 110, Color: "#eefbf3"},
+			{ID: "tik", Name: "TIK / Data Center", Short: "TIK", X: 498, Y: 238, W: 210, H: 66, Subnet: "10.10.1.0/24", Vlan: 1, Color: "#fff6e9"},
+			{ID: "mif", Name: "Gedung MIF", Short: "MIF", X: 736, Y: 208, W: 170, H: 68, Subnet: "10.10.12.0/24", Vlan: 112, Color: "#f1f5ff"},
+			{ID: "mesin", Name: "Teknik Mesin", Short: "MSN", X: 120, Y: 312, W: 164, H: 62, Subnet: "10.10.20.0/24", Vlan: 120, Color: "#f9f2ff"},
+			{ID: "tep", Name: "Teknologi Pertanian", Short: "TEP", X: 315, Y: 318, W: 168, H: 60, Subnet: "10.10.30.0/24", Vlan: 130, Color: "#f2fff5"},
+			{ID: "pet", Name: "Peternakan", Short: "PET", X: 514, Y: 334, W: 156, H: 58, Subnet: "10.10.40.0/24", Vlan: 140, Color: "#fff7f2"},
+			{ID: "labterpadu", Name: "Lab Terpadu", Short: "LAB", X: 704, Y: 312, W: 190, H: 60, Subnet: "10.10.50.0/24", Vlan: 150, Color: "#f5fbff"},
+			{ID: "perpustakaan", Name: "Perpustakaan", Short: "PUS", X: 208, Y: 418, W: 170, H: 56, Subnet: "10.10.60.0/24", Vlan: 160, Color: "#f7f7ff"},
+			{ID: "aula", Name: "Aula Soetrisno", Short: "AULA", X: 410, Y: 424, W: 174, H: 54, Subnet: "10.10.61.0/24", Vlan: 161, Color: "#fffaf0"},
+			{ID: "gor", Name: "GOR Perjuangan 45", Short: "GOR", X: 620, Y: 419, W: 214, H: 58, Subnet: "10.10.62.0/24", Vlan: 162, Color: "#f2fbff"},
+			{ID: "asrama", Name: "Asrama Mahasiswa", Short: "ASR", X: 156, Y: 512, W: 198, H: 52, Subnet: "10.10.70.0/24", Vlan: 170, Color: "#fef6ff"},
+			{ID: "kantin", Name: "Kantin Pusat", Short: "KTN", X: 402, Y: 514, W: 154, H: 50, Subnet: "10.10.71.0/24", Vlan: 171, Color: "#f8fff3"},
+			{ID: "greenhouse", Name: "Green House / Lab Lapang", Short: "GH", X: 634, Y: 508, W: 216, H: 52, Subnet: "10.10.80.0/24", Vlan: 180, Color: "#f1fff9"},
 		}
 	}
 	C = cfg
