@@ -191,7 +191,7 @@ const vendorTone: Record<VendorName, string> = {
   Supermicro:"#5b5bd6"
 }
 
-const API_BASE = import.meta.env.DEV ? "http://localhost:8080/api" : "/api"
+const API_BASE = import.meta.env.DEV ? "http://localhost:9090/api" : "/api"
 
 export default function App(){
   const [buildings, setBuildings] = useState<Building[]>(INITIAL_BUILDINGS)

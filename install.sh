@@ -70,11 +70,11 @@ check_port() {
 }
 
 echo -e "Memeriksa ketersediaan port..."
-if ! check_port 8080; then
-    echo -e "${RED}Error: Port 8080 sedang digunakan oleh aplikasi lain.${NC}"
+if ! check_port 9090; then
+    echo -e "${RED}Error: Port 9090 sedang digunakan oleh aplikasi lain.${NC}"
     exit 1
 fi
-echo -e "${GREEN}✓ Port 8080 Tersedia${NC}"
+echo -e "${GREEN}✓ Port 9090 Tersedia${NC}"
 
 # 3. Add PPAs and Repositories
 echo -e "\n${BLUE}[2/6] Menambahkan PPA dan dependensi repositori...${NC}"
@@ -191,7 +191,7 @@ chown -R netmon:netmon /etc/netmon
 cat <<EOT > /etc/netmon/config.yaml
 server:
   host: 0.0.0.0
-  port: 8080
+  port: 9090
   cors: true
 
 database:
@@ -275,8 +275,8 @@ fi
 echo -e "\n${GREEN}======================================================================"
 echo -e "                   INSTALASI BERHASIL DISELESAIKAN                    "
 echo -e "======================================================================${NC}"
-echo -e "Aplikasi NetMon Polije siap diakses melalui browser pada port 8080."
-echo -e "URL: ${BLUE}http://localhost:8080/${NC}"
+echo -e "Aplikasi NetMon Polije siap diakses melalui browser pada port 9090."
+echo -e "URL: ${BLUE}http://localhost:9090/${NC}"
 echo -e "Lokasi Biner: ${BLUE}$DEPLOY_DIR/netmon${NC}"
 echo -e "Berkas Konfigurasi: ${BLUE}/etc/netmon/config.yaml${NC}"
 echo -e "Layanan Database: ${BLUE}PostgreSQL 16 (DB: $DB_NAME, User: $DB_USER)${NC}"

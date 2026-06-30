@@ -100,7 +100,7 @@ func Load(path string) (*Config, error) {
 
 	// WSL-friendly defaults (bind 0.0.0.0 so portproxy works)
 	v.SetDefault("server.host", "0.0.0.0")
-	v.SetDefault("server.port", 8080)
+	v.SetDefault("server.port", 9090)
 	v.SetDefault("server.cors", true)
 
 	v.SetDefault("database.driver", "sqlite3")
