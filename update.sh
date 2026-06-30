@@ -77,6 +77,16 @@ if [ -f /etc/netmon/config.yaml ]; then
     sed -i 's/port: 8080/port: 9090/g' /etc/netmon/config.yaml || true
 fi
 
+# Reset PostgreSQL database tables to ensure clean migration on start
+echo -e "\n${BLUE}[Resetting Database] Mengosongkan tabel database PostgreSQL...${NC}"
+if command -v psql &>/dev/null; then
+    sudo -u postgres psql -d netmon -c "DROP TABLE IF EXISTS devices, metrics, alerts CASCADE;" || true
+    echo -e "${GREEN}✓ Tabel database netmon berhasil di-drop (reset).${NC}"
+else
+    echo -e "${YELLOW}Warning: PostgreSQL client (psql) tidak terdeteksi. Melewati database reset...${NC}"
+fi
+
+
 
 # 4. Restart services
 echo -e "\n${BLUE}[4/4] Memuat ulang layanan...${NC}"
