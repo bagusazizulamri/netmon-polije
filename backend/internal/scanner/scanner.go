@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
@@ -85,8 +86,8 @@ func (sc *Scanner) Scan(ctx context.Context, cidr string, communities []string) 
 }
 
 func (sc *Scanner) probeIP(ip string) (float64, bool) {
-	// TCP ping to common ports (works without CAP_NET_RAW, works great on WSL)
-	ports := []int{22, 80, 443, 161, 8291, 8443}
+	// 1. TCP ping to common ports (excluding 161 because SNMP uses UDP)
+	ports := []int{22, 80, 443, 8291, 8443, 23, 8080}
 	var best time.Duration = 9999 * time.Second
 	for _, p := range ports {
 		start := time.Now()
@@ -99,10 +100,36 @@ func (sc *Scanner) probeIP(ip string) (float64, bool) {
 			conn.Close()
 		}
 	}
-	if best == 9999*time.Second {
-		return 0, false
+	if best != 9999*time.Second {
+		return float64(best.Microseconds()) / 1000.0, true
 	}
-	return float64(best.Microseconds()) / 1000.0, true
+
+	// 2. Fallback: Quick SNMP UDP check (essential for SNMP-only devices)
+	start := time.Now()
+	g := &gosnmp.GoSNMP{
+		Target:    ip,
+		Port:      161,
+		Community: "public",
+		Version:   gosnmp.Version2c,
+		Timeout:   200 * time.Millisecond,
+		Retries:   0,
+	}
+	if err := g.Connect(); err == nil {
+		_, err = g.Get([]string{".1.3.6.1.2.1.1.2.0"})
+		g.Conn.Close()
+		if err == nil {
+			return float64(time.Since(start).Microseconds()) / 1000.0, true
+		}
+	}
+
+	// 3. Fallback: System ping utility (runs with raw privilege because NetMon runs under sudo)
+	start = time.Now()
+	cmd := exec.Command("ping", "-c", "1", "-W", "1", ip)
+	if err := cmd.Run(); err == nil {
+		return float64(time.Since(start).Milliseconds()), true
+	}
+
+	return 0, false
 }
 
 func probePort(ip string, p int, to time.Duration) bool {

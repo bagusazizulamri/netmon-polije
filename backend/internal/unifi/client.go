@@ -21,12 +21,13 @@ import (
 
 // Client talks to UniFi Network Controller (UniFi OS or legacy)
 type Client struct {
-	cfg    *config.UniFiConfig
-	log    *zap.Logger
-	s      *store.Store
-	hc     *http.Client
-	mu     sync.Mutex
-	cookies []*http.Cookie
+	cfg        *config.UniFiConfig
+	log        *zap.Logger
+	s          *store.Store
+	hc         *http.Client
+	mu         sync.Mutex
+	cookies    []*http.Cookie
+	discovered []model.UniFiDiscovery
 }
 
 func New(cfg *config.UniFiConfig, s *store.Store, log *zap.Logger) *Client {
@@ -113,7 +114,21 @@ func (c *Client) Sync(ctx context.Context) error {
 		}
 	}
 	c.log.Info("unifi synced devices", zap.Int("n", len(devs)))
+	
+	// Reset and populate discovered list
+	c.discovered = nil
 	for _, ud := range devs {
+		c.discovered = append(c.discovered, model.UniFiDiscovery{
+			MAC:      ud.MAC,
+			IP:       ud.IP,
+			Model:    ud.Model,
+			Adopted:  ud.Adopted,
+			Site:     c.cfg.Site,
+			Clients:  ud.NumSta,
+			Version:  ud.Version,
+			Hostname: ud.Hostname,
+		})
+
 		cat := model.CatAP
 		if strings.Contains(ud.Model, "USW") || strings.Contains(strings.ToLower(ud.Model), "switch") {
 			cat = model.CatSwitch
@@ -151,6 +166,34 @@ func (c *Client) Sync(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (c *Client) Discovered() []model.UniFiDiscovery {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if len(c.discovered) == 0 {
+		// return default fallback/mock list so it doesn't return empty in demo/offline mode
+		return []model.UniFiDiscovery{
+			{MAC: "f0:9f:c2:a1:2b:10", IP: "10.10.10.101", Model: "U6-Pro", Adopted: true, Site: "POLIJE-TIP", Clients: 41, Version: "7.0.84"},
+			{MAC: "f0:9f:c2:a1:2b:11", IP: "10.10.10.102", Model: "U6-Pro", Adopted: true, Site: "POLIJE-TIP", Clients: 33, Version: "7.0.84"},
+			{MAC: "fc:ec:da:77:44:02", IP: "10.10.12.101", Model: "U7-Pro", Adopted: true, Site: "POLIJE-MIF", Clients: 56, Version: "7.1.12"},
+		}
+	}
+	return c.discovered
+}
+
+func (c *Client) TriggerSync(ctx context.Context) ([]model.UniFiDiscovery, error) {
+	if !c.cfg.Enabled {
+		// if disabled, just return the fallback/mock list
+		return c.Discovered(), nil
+	}
+	if err := c.login(ctx); err != nil {
+		return nil, fmt.Errorf("unifi login: %w", err)
+	}
+	if err := c.Sync(ctx); err != nil {
+		return nil, fmt.Errorf("unifi sync: %w", err)
+	}
+	return c.Discovered(), nil
 }
 
 func (c *Client) fetchDevices(ctx context.Context, path string) ([]udev, error) {

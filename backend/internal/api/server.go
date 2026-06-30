@@ -15,6 +15,7 @@ import (
 	"github.com/polije/netmon/internal/config"
 	"github.com/polije/netmon/internal/scanner"
 	"github.com/polije/netmon/internal/store"
+	"github.com/polije/netmon/internal/unifi"
 	"go.uber.org/zap"
 )
 
@@ -24,10 +25,11 @@ type Server struct {
 	app    *fiber.App
 	store  *store.Store
 	scan   *scanner.Scanner
+	unifi  *unifi.Client
 	log    *zap.Logger
 }
 
-func New(cfg *config.Config, s *store.Store, scan *scanner.Scanner, log *zap.Logger, staticFS embed.FS) *Server {
+func New(cfg *config.Config, s *store.Store, scan *scanner.Scanner, uc *unifi.Client, log *zap.Logger, staticFS embed.FS) *Server {
 	app := fiber.New(fiber.Config{
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 60 * time.Second,
@@ -47,7 +49,7 @@ func New(cfg *config.Config, s *store.Store, scan *scanner.Scanner, log *zap.Log
 		}))
 	}
 
-	srv := &Server{cfg: cfg, app: app, store: s, scan: scan, log: log}
+	srv := &Server{cfg: cfg, app: app, store: s, scan: scan, unifi: uc, log: log}
 	srv.register(staticFS)
 	return srv
 }

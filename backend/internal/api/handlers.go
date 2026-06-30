@@ -260,17 +260,15 @@ func (s *Server) runScan(c *fiber.Ctx) error {
 }
 
 func (s *Server) triggerUniFi(c *fiber.Ctx) error {
-	unifiMu.Lock()
-	// stub: in production this calls the unifi.Client; here return current list
-	list := append([]model.UniFiDiscovery{}, unifiDevices...)
-	unifiMu.Unlock()
+	list, err := s.unifi.TriggerSync(c.Context())
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
 	return c.JSON(list)
 }
 
 func (s *Server) listUniFi(c *fiber.Ctx) error {
-	unifiMu.Lock()
-	defer unifiMu.Unlock()
-	return c.JSON(unifiDevices)
+	return c.JSON(s.unifi.Discovered())
 }
 
 func (s *Server) getScanStatus(c *fiber.Ctx) error {

@@ -57,7 +57,7 @@ func main() {
 
 	// embedded UI is served by api; we don't need to pass it here if dist/ doesn't exist yet.
 	// use a blank embed.FS if dist is not present at build time.
-	srv := api.New(cfg, s, sc, log, uiFS)
+	srv := api.New(cfg, s, sc, uc, log, uiFS)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
