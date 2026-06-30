@@ -608,7 +608,7 @@ export default function App(){
                   <div className="text-[11.8px] text-zinc-500">SNMP v2c • ICMP 1s</div>
                 </div>
                 <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-[12px]">
-                  {BUILDINGS.map(b=>{
+                  {buildings.map(b=>{
                     const devs = devices.filter(d=>d.buildingId===b.id)
                     const ok = devs.filter(d=>d.status==="online").length
                     const pct = devs.length ? Math.round(ok/devs.length*100) : 0
@@ -661,7 +661,7 @@ export default function App(){
                     <path d="M720 448 C700 482 690 502 738 535" />
                   </g>
 
-                  {BUILDINGS.map(b=>{
+                  {buildings.map(b=>{
                     const devs = devices.filter(d=>d.buildingId===b.id)
                     const bad = devs.some(d=>d.status==="offline")
                     const warn = devs.some(d=>d.status==="warning")
@@ -685,7 +685,7 @@ export default function App(){
 
                   {/* device dots */}
                   {devices.map(d=>{
-                    const b = BUILDINGS.find(bb=>bb.id===d.buildingId)
+                    const b = buildings.find(bb=>bb.id===d.buildingId)
                     if(!b) return null
                     const i = devices.filter(x=>x.buildingId===b.id).findIndex(x=>x.id===d.id)
                     const dx = b.x + 16 + (i%6)*22
@@ -854,7 +854,7 @@ export default function App(){
                           </div>
                         </td>
                         <td className="px-5 py-[13px] text-[12.7px] text-zinc-600">
-                          {BUILDINGS.find(b=>b.id===d.buildingId)?.short} • {d.floor||"-"}
+                           {buildings.find(b=>b.id===d.buildingId)?.short} • {d.floor||"-"}
                         </td>
                         <td className="px-5 py-[13px]">
                           <StatusPill status={d.status}/>
@@ -1220,7 +1220,7 @@ New-NetFirewallRule -DisplayName "NetMon WSL" -Direction Inbound -Action Allow -
               <div className="flex gap-2 flex-wrap">
                 <StatusPill status={selectedDevice.status}/>
                 <span className="text-[11px] px-[9px] py-[4px] rounded-full bg-zinc-100 text-zinc-700">{selectedDevice.category.toUpperCase()}</span>
-                <span className="text-[11px] px-[9px] py-[4px] rounded-full bg-zinc-100 text-zinc-700">{BUILDINGS.find(b=>b.id===selectedDevice.buildingId)?.short}</span>
+                <span className="text-[11px] px-[9px] py-[4px] rounded-full bg-zinc-100 text-zinc-700">{buildings.find(b=>b.id===selectedDevice.buildingId)?.short}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-[12.7px]">
@@ -1249,7 +1249,7 @@ New-NetFirewallRule -DisplayName "NetMon WSL" -Direction Inbound -Action Allow -
               )}
 
               <div className="text-[12.6px] text-zinc-700 space-y-[6px]">
-                <div><b>Lokasi:</b> {BUILDINGS.find(b=>b.id===selectedDevice.buildingId)?.name} {selectedDevice.floor ? "• "+selectedDevice.floor : ""}</div>
+                <div><b>Lokasi:</b> {buildings.find(b=>b.id===selectedDevice.buildingId)?.name} {selectedDevice.floor ? "• "+selectedDevice.floor : ""}</div>
                 <div><b>SNMP:</b> {selectedDevice.snmp ? `v2c • ${selectedDevice.snmpCommunity||"RO"}` : "non-SNMP / API"}</div>
                 <div><b>Last seen:</b> {timeAgo(selectedDevice.lastSeen)} lalu</div>
                 {selectedDevice.notes && <div className="text-amber-700"><b>Catatan:</b> {selectedDevice.notes}</div>}
