@@ -49,8 +49,8 @@ func (s *Store) migrate() error {
 				building_id TEXT, floor TEXT, status TEXT, uptime_sec INTEGER,
 				cpu REAL, mem REAL, temp REAL, latency_ms REAL, loss REAL,
 				traffic_in_mbps REAL, traffic_out_mbps REAL, clients INTEGER, poe_w REAL,
-				snmp INTEGER, snmp_community TEXT, site TEXT, last_seen TIMESTAMPTZ,
-				notes TEXT, auto_discovered INTEGER, source TEXT, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ
+				snmp BOOLEAN, snmp_community TEXT, site TEXT, last_seen TIMESTAMPTZ,
+				notes TEXT, auto_discovered BOOLEAN, source TEXT, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ
 			)`,
 			`CREATE TABLE IF NOT EXISTS metrics (
 				device_id TEXT, ts TIMESTAMPTZ, cpu REAL, mem REAL, temp REAL, latency REAL,
@@ -58,7 +58,7 @@ func (s *Store) migrate() error {
 				PRIMARY KEY(device_id, ts)
 			)`,
 			`CREATE TABLE IF NOT EXISTS alerts (
-				id TEXT PRIMARY KEY, device_id TEXT, severity TEXT, message TEXT, ack INTEGER,
+				id TEXT PRIMARY KEY, device_id TEXT, severity TEXT, message TEXT, ack BOOLEAN,
 				created_at TIMESTAMPTZ
 			)`,
 			`CREATE INDEX IF NOT EXISTS idx_metrics_ts ON metrics(ts);`,
@@ -73,8 +73,8 @@ func (s *Store) migrate() error {
 				building_id TEXT, floor TEXT, status TEXT, uptime_sec INTEGER,
 				cpu REAL, mem REAL, temp REAL, latency_ms REAL, loss REAL,
 				traffic_in_mbps REAL, traffic_out_mbps REAL, clients INTEGER, poe_w REAL,
-				snmp INTEGER, snmp_community TEXT, site TEXT, last_seen DATETIME,
-				notes TEXT, auto_discovered INTEGER, source TEXT, created_at DATETIME, updated_at DATETIME
+				snmp BOOLEAN, snmp_community TEXT, site TEXT, last_seen DATETIME,
+				notes TEXT, auto_discovered BOOLEAN, source TEXT, created_at DATETIME, updated_at DATETIME
 			)`,
 			`CREATE TABLE IF NOT EXISTS metrics (
 				device_id TEXT, ts DATETIME, cpu REAL, mem REAL, temp REAL, latency REAL,
@@ -82,7 +82,7 @@ func (s *Store) migrate() error {
 				PRIMARY KEY(device_id, ts)
 			)`,
 			`CREATE TABLE IF NOT EXISTS alerts (
-				id TEXT PRIMARY KEY, device_id TEXT, severity TEXT, message TEXT, ack INTEGER,
+				id TEXT PRIMARY KEY, device_id TEXT, severity TEXT, message TEXT, ack BOOLEAN,
 				created_at DATETIME
 			)`,
 			`CREATE INDEX IF NOT EXISTS idx_metrics_ts ON metrics(ts);`,
@@ -188,7 +188,7 @@ func (s *Store) ListAlerts(ack *bool, limit int) ([]model.Alert, error) {
 	var args []any
 	if ack != nil {
 		q += ` AND ack = ?`
-		args = append(args, btoi(*ack))
+		args = append(args, *ack)
 	}
 	q += ` ORDER BY created_at DESC LIMIT ?`
 	args = append(args, limit)
@@ -207,23 +207,16 @@ func (s *Store) CreateAlert(a *model.Alert) error {
 		a.CreatedAt = time.Now().UTC()
 	}
 	_, err := s.db.Exec(s.db.Rebind(`INSERT INTO alerts(id, device_id, severity, message, ack, created_at)
-		VALUES(?, ?, ?, ?, ?, ?)`), a.ID, a.DeviceID, a.Severity, a.Message, btoi(a.Ack), a.CreatedAt)
+		VALUES(?, ?, ?, ?, ?, ?)`), a.ID, a.DeviceID, a.Severity, a.Message, a.Ack, a.CreatedAt)
 	return err
 }
 
 func (s *Store) AckAlert(id string, ack bool) error {
-	_, err := s.db.Exec(s.db.Rebind(`UPDATE alerts SET ack = ? WHERE id = ?`), btoi(ack), id)
+	_, err := s.db.Exec(s.db.Rebind(`UPDATE alerts SET ack = ? WHERE id = ?`), ack, id)
 	return err
 }
 
 func (s *Store) AckAll() error {
-	_, err := s.db.Exec(`UPDATE alerts SET ack = 1`)
+	_, err := s.db.Exec(`UPDATE alerts SET ack = true`)
 	return err
-}
-
-func btoi(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }
