@@ -71,6 +71,13 @@ cp backend/netmon $DEPLOY_DIR/netmon
 chown -R netmon:netmon $DEPLOY_DIR
 echo -e "${GREEN}✓ Biner backend berhasil dikompilasi dan disalin ke $DEPLOY_DIR/netmon.${NC}"
 
+# Update config.yaml port if it exists to match the new 9090 port
+if [ -f /etc/netmon/config.yaml ]; then
+    echo "Memperbarui port di /etc/netmon/config.yaml ke 9090..."
+    sed -i 's/port: 8080/port: 9090/g' /etc/netmon/config.yaml || true
+fi
+
+
 # 4. Restart services
 echo -e "\n${BLUE}[4/4] Memuat ulang layanan...${NC}"
 if [ "$IS_WSL" = false ] && systemctl is-active --quiet netmon; then
