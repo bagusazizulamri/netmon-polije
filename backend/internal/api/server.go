@@ -87,7 +87,7 @@ func (s *Server) register(staticFS embed.FS) {
 	api.Get("/metrics/traffic", s.getTrafficMetrics)
 
 	// Serve embedded landing page (from //go:embed dist)
-	if staticFS != nil {
+	if _, err := staticFS.Open("dist/index.html"); err == nil {
 		if sub, err := fs.Sub(staticFS, "dist"); err == nil {
 			s.app.Get("/", func(c *fiber.Ctx) error {
 				f, err := sub.Open("index.html")
