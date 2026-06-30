@@ -1,0 +1,27 @@
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Go/Backend
+backend/netmon
+backend/data/
+backend/dist/
+backend/config.yaml
+*.db
+*.db-wal
+*.db-shm
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db

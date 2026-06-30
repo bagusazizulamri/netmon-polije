@@ -1,0 +1,26 @@
+[Unit]
+Description=NetMon Polije Network Monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=netmon
+Group=netmon
+WorkingDirectory=/opt/netmon
+ExecStart=/opt/netmon/netmon -config /opt/netmon/config.yaml
+Restart=on-failure
+RestartSec=5s
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/netmon/data
+# Environment variable overrides:
+# Environment=NETMON_UNIFI_PASS=changeme
+# Environment=NETMON_DATABASE_DSN=/opt/netmon/data/netmon.db
+
+[Install]
+WantedBy=multi-user.target

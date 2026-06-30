@@ -1,0 +1,54 @@
+server:
+  host: 0.0.0.0   # gunakan 0.0.0.0 untuk WSL NAT / Docker / bare metal
+  port: 8080
+  cors: true
+
+database:
+  driver: sqlite3     # ganti postgres untuk production (TimescaleDB-ready)
+  dsn: ./data/netmon.db
+  # dsn: "postgres://netmon:secret@timescale:5432/netmon?sslmode=disable"
+
+poll:
+  interval: 30s
+  icmp: true
+  workers: 128
+  bulk_oids: true
+
+log:
+  level: info         # debug / info / warn / error
+  pretty: true
+
+snmp:
+  communities:
+    - publicPolije
+    - polijeRO
+    - ruijieRO
+    - unifiRO
+    - public
+  port: 161
+  timeout: 750ms
+  retries: 2
+  version: v2c        # v2c atau v3
+  v3:
+    user: netmon
+    auth_proto: SHA
+    auth_pass: ""
+    priv_proto: AES
+    priv_pass: ""
+
+unifi:
+  enabled: true
+  url: https://10.10.1.40:8443
+  user: netmon@polije.ac.id
+  pass: GANTI_PASSWORD
+  site: default
+  auto_adopt: true
+  interval: 5m
+  insecure: true
+
+scan:
+  default_cidr: 10.10.0.0/22
+  concurrency: 256
+  ping_timeout: 800ms
+  snmp_timeout: 750ms
+  auto_import: false

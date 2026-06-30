@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  netmon-api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    network_mode: host    # penting di Linux bare metal / VM bridged; untuk WSL sebaiknya gunakan port mapping + portproxy Windows
+    # ports:
+    #   - "8080:8080"
+    environment:
+      NETMON_SERVER_HOST: "0.0.0.0"
+      NETMON_SERVER_PORT: "8080"
+      NETMON_DATABASE_DRIVER: "sqlite3"
+      NETMON_DATABASE_DSN: "/app/data/netmon.db"
+      NETMON_UNIFI_URL: "https://10.10.1.40:8443"
+      NETMON_UNIFI_USER: "netmon@polije.ac.id"
+      NETMON_UNIFI_PASS: "CHANGE_ME"
+      NETMON_UNIFI_SITE: "default"
+      NETMON_UNIFI_ENABLED: "true"
+      NETMON_SNMP_COMMUNITIES: "publicPolije,polijeRO,ruijieRO,unifiRO"
+      TZ: "Asia/Jakarta"
+    volumes:
+      - netmon-data:/app/data
+    cap_add:
+      - NET_RAW   # opsional: untuk ICMP RAW (TCP ping tetap jalan tanpa ini)
+
+volumes:
+  netmon-data:
